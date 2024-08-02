@@ -1,4 +1,5 @@
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Pool;
 
@@ -9,6 +10,7 @@ public class Cube : MonoBehaviour
     [SerializeField] private int _maxLiftime = 5;
 
     private Renderer _renderer;
+    private Spawner _spawner;
 
     private bool _isWaitToBeDestroyed = false;
 
@@ -24,16 +26,25 @@ public class Cube : MonoBehaviour
         pool.Release(this);
     }
 
-    public void DeactivateWithDelay(ObjectPool<Cube> pool)
+    private void OnCollisionEnter(Collision other)
     {
-        _isWaitToBeDestroyed = true;
-        int time = Random.Range(_minLiftime, _maxLiftime + 1);
-        StartCoroutine(ReleaseWithDelay(time, pool));
+        if (other.gameObject.TryGetComponent<Ground>(out Ground ground))
+        {
+            if (_isWaitToBeDestroyed) return;
+            _isWaitToBeDestroyed = true;
+            _renderer.material.color = Random.ColorHSV();
+            _spawner.DeactivateCube(this);
+        }
     }
 
-    public void TrySetColor(Color color)
+    public void Init(Spawner spawner)
     {
-        if (_isWaitToBeDestroyed == false)
-            _renderer.material.color = color;
+        _spawner = spawner;
+    }
+
+    public void DeactivateWithDelay(ObjectPool<Cube> pool)
+    {
+        int time = Random.Range(_minLiftime, _maxLiftime + 1);
+        StartCoroutine(ReleaseWithDelay(time, pool));
     }
 }
