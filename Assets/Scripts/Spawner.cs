@@ -5,8 +5,6 @@ public class Spawner : MonoBehaviour
 {
     [SerializeField] private Cube _prefab;
     [SerializeField] private GameObject _startPoint;
-    [SerializeField] private Collider _ground;
-    [SerializeField] private Collider _groundd;
     [SerializeField] private float _repeatRate = 1f;
     [SerializeField] private int _poolCapacity = 20;
     [SerializeField] private int _poolMaxSize = 20;
