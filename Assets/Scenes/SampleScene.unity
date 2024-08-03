@@ -189,9 +189,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _prefab: {fileID: 7368381427932186497, guid: da120e54171e824e5b2345ba4b20d70e, type: 3}
-  _startPoint: {fileID: 57699565}
-  _ground: {fileID: 0}
-  _groundd: {fileID: 0}
+  _startPoint: {fileID: 57699569}
   _repeatRate: 1
   _poolCapacity: 20
   _poolMaxSize: 20

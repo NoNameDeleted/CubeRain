@@ -4,7 +4,7 @@ using UnityEngine.Pool;
 public class Spawner : MonoBehaviour
 {
     [SerializeField] private Cube _prefab;
-    [SerializeField] private GameObject _startPoint;
+    [SerializeField] private Transform _startPoint;
     [SerializeField] private float _repeatRate = 1f;
     [SerializeField] private int _poolCapacity = 20;
     [SerializeField] private int _poolMaxSize = 20;
@@ -29,28 +29,23 @@ public class Spawner : MonoBehaviour
         InvokeRepeating(nameof(GetCube), 0.0f, _repeatRate);
     }
 
-    private void ActionOnGet(Cube obj)
+    private void ActionOnGet(Cube cube)
     {
-        obj.transform.position = _startPoint.transform.position + Random.insideUnitSphere * 5;
-        obj.GetComponent<Rigidbody>().velocity = Vector3.zero;
-        obj.GetComponent<Renderer>().material.color = Color.red;
-        obj.gameObject.SetActive(true);
+        cube.transform.position = _startPoint.position + Random.insideUnitSphere * 5;
+        cube.GetComponent<Rigidbody>().velocity = Vector3.zero;
+        cube.GetComponent<Renderer>().material.color = Color.red;
+        cube.gameObject.SetActive(true);
     }
 
     private Cube ActionOnCreate(Cube prefab)
     {
         Cube cube = Instantiate(prefab);
-        cube.Init(this);
+        cube.Waited += _pool.Release;
         return cube;
     }
 
     private void GetCube()
     {
         _pool.Get();
-    }
-
-    public void DeactivateCube(Cube cube)
-    {
-        cube.DeactivateWithDelay(_pool);
     }
 }
