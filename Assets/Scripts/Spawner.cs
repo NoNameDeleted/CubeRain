@@ -14,10 +14,10 @@ public class Spawner : MonoBehaviour
     private void Awake()
     {
         _pool = new ObjectPool<Cube>(
-            createFunc: () => ActionOnCreate(_prefab),
-            actionOnGet: (obj) => ActionOnGet(obj),
+            createFunc: () => CreateCube(_prefab),
+            actionOnGet: (obj) => GetCube(obj),
             actionOnRelease: (obj) => obj.gameObject.SetActive(false),
-            actionOnDestroy: (obj) => ActionOnDestroy(obj),
+            actionOnDestroy: (obj) => DestroyCube(obj),
             collectionCheck: true,
             defaultCapacity: _poolCapacity,
             maxSize: _poolMaxSize
@@ -29,7 +29,7 @@ public class Spawner : MonoBehaviour
         InvokeRepeating(nameof(GetCube), 0.0f, _repeatRate);
     }
 
-    private void ActionOnGet(Cube cube)
+    private void GetCube(Cube cube)
     {
         cube.transform.position = _startPoint.position + Random.insideUnitSphere * 5;
         cube.GetComponent<Rigidbody>().velocity = Vector3.zero;
@@ -37,14 +37,14 @@ public class Spawner : MonoBehaviour
         cube.gameObject.SetActive(true);
     }
 
-    private Cube ActionOnCreate(Cube prefab)
+    private Cube CreateCube(Cube prefab)
     {
         Cube cube = Instantiate(prefab);
         cube.Waited += _pool.Release;
         return cube;
     }
 
-    private void ActionOnDestroy(Cube cube)
+    private void DestroyCube(Cube cube)
     {
         cube.Waited -= _pool.Release;
         Destroy(cube);
