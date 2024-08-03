@@ -1,52 +1,37 @@
 using UnityEngine;
 using UnityEngine.Pool;
 
-public class Spawner : MonoBehaviour
+abstract public class Spawner<T> : MonoBehaviour where T : MonoBehaviour
 {
-    [SerializeField] private Cube _prefab;
-    [SerializeField] private GameObject _startPoint;
-    [SerializeField] private Collider _ground;
-    [SerializeField] private Collider _groundd;
-    [SerializeField] private float _repeatRate = 1f;
+    [SerializeField] private T _prefab;
+
     [SerializeField] private int _poolCapacity = 20;
     [SerializeField] private int _poolMaxSize = 20;
 
-    private ObjectPool<Cube> _pool;
+    private ObjectPool<T> _pool;
+
+    public ObjectPool<T> Pool
+    {
+        get { return _pool; }
+        private set {}
+    }
 
     private void Awake()
     {
-        _pool = new ObjectPool<Cube>(
-            createFunc: () => Instantiate(_prefab),
+        _pool = new ObjectPool<T>(
+            createFunc: () => ActionOnCreate(_prefab),
             actionOnGet: (obj) => ActionOnGet(obj),
             actionOnRelease: (obj) => obj.gameObject.SetActive(false),
-            actionOnDestroy: (obj) => Destroy(obj),
+            actionOnDestroy: (obj) => ActionOnDestroy(obj),
             collectionCheck: true,
             defaultCapacity: _poolCapacity,
             maxSize: _poolMaxSize
         );
-
     }
 
-    private void ActionOnGet(Cube obj)
-    {
-        obj.transform.position = _startPoint.transform.position + Random.insideUnitSphere * 5;
-        obj.GetComponent<Rigidbody>().velocity = Vector3.zero;
-        obj.GetComponent<Renderer>().material.color = Color.red;
-        obj.gameObject.SetActive(true);
-    }
+    abstract public T ActionOnCreate(T prefab);
 
-    private void Start()
-    {
-        InvokeRepeating(nameof(GetCube), 0.0f, _repeatRate);
-    }
+    abstract public void ActionOnGet(T obj);
 
-    private void GetCube()
-    {
-        _pool.Get();
-    }
-
-    public void DeactivateCube(Cube cube)
-    {
-        cube.DeactivateWithDelay(_pool);
-    }
+    abstract public void ActionOnDestroy(T obj);
 }

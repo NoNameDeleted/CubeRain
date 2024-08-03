@@ -1,6 +1,9 @@
+using System;
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Pool;
+using Random = UnityEngine.Random;
 
 [RequireComponent(typeof(Renderer))]
 public class Cube : MonoBehaviour
@@ -9,31 +12,33 @@ public class Cube : MonoBehaviour
     [SerializeField] private int _maxLiftime = 5;
 
     private Renderer _renderer;
-
     private bool _isWaitToBeDestroyed = false;
+
+    public event Action<Cube> Waited;
 
     private void Awake()
     {
         _renderer = GetComponent<Renderer>();
     }
 
-    private IEnumerator ReleaseWithDelay(int delay, ObjectPool<Cube> pool)
+    private IEnumerator ReleaseWithDelay()
     {
+        int delay = Random.Range(_minLiftime, _maxLiftime + 1);
         yield return new WaitForSeconds(delay);
         _isWaitToBeDestroyed = false;
-        pool.Release(this);
+        Waited?.Invoke(this);
     }
 
-    public void DeactivateWithDelay(ObjectPool<Cube> pool)
+    private void OnCollisionEnter(Collision other)
     {
-        _isWaitToBeDestroyed = true;
-        int time = Random.Range(_minLiftime, _maxLiftime + 1);
-        StartCoroutine(ReleaseWithDelay(time, pool));
-    }
-
-    public void TrySetColor(Color color)
-    {
-        if (_isWaitToBeDestroyed == false)
-            _renderer.material.color = color;
+        if (other.transform.TryGetComponent<Platform>(out Platform ground))
+        {
+            if (_isWaitToBeDestroyed) 
+                return;
+                
+            _isWaitToBeDestroyed = true;
+            _renderer.material.color = Random.ColorHSV();
+            StartCoroutine(ReleaseWithDelay());
+        }
     }
 }
