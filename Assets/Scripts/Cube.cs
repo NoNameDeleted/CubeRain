@@ -1,8 +1,6 @@
 using System;
 using System.Collections;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Pool;
 using Random = UnityEngine.Random;
 
 [RequireComponent(typeof(Renderer))]
@@ -35,7 +33,7 @@ public class Cube : MonoBehaviour
         {
             if (_isWaitToBeDestroyed) 
                 return;
-                
+
             _isWaitToBeDestroyed = true;
             _renderer.material.color = Random.ColorHSV();
             StartCoroutine(ReleaseWithDelay());
