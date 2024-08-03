@@ -17,7 +17,7 @@ public class Spawner : MonoBehaviour
             createFunc: () => ActionOnCreate(_prefab),
             actionOnGet: (obj) => ActionOnGet(obj),
             actionOnRelease: (obj) => obj.gameObject.SetActive(false),
-            actionOnDestroy: (obj) => Destroy(obj),
+            actionOnDestroy: (obj) => ActionOnDestroy(obj),
             collectionCheck: true,
             defaultCapacity: _poolCapacity,
             maxSize: _poolMaxSize
@@ -42,6 +42,12 @@ public class Spawner : MonoBehaviour
         Cube cube = Instantiate(prefab);
         cube.Waited += _pool.Release;
         return cube;
+    }
+
+    private void ActionOnDestroy(Cube cube)
+    {
+        cube.Waited -= _pool.Release;
+        Destroy(cube);
     }
 
     private void GetCube()
