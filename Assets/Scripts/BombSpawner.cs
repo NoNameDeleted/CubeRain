@@ -12,6 +12,7 @@ public class BombSpawner : Spawner<Bomb>
     public override Bomb ActionOnCreate(Bomb prefab)
     {
         Bomb bomb = Instantiate(prefab);
+        bomb.Destroyed += Pool.Release;
         return bomb;
     }
 
@@ -24,6 +25,8 @@ public class BombSpawner : Spawner<Bomb>
     {
         Bomb bomb = Pool.Get();
         bomb.transform.position = position;
+        bomb.Init();
+        StartCoroutine(bomb.ExploidWithDelay());
     }
 
     public override void ActionOnDestroy(Bomb obj)
